@@ -1,5 +1,4 @@
 import time
-import json
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -51,7 +50,7 @@ def fetch_match_data(url, match_id, internal_id):
                 time_str = spans[1].text.strip()
                 if scorer and time_str:
                     goal_data.append((scorer, time_str))
-    except Exception as e:
+    except Exception:
         pass
 
     # 경기 날짜
@@ -89,7 +88,6 @@ def fetch_match_data(url, match_id, internal_id):
 
     driver.quit()
 
-    # _id를 match_id와 internal_id 조합으로 생성
     return {
         "_id": f"{match_id}_{internal_id}",
         "match_id": match_id,
@@ -107,21 +105,15 @@ def fetch_match_data(url, match_id, internal_id):
         "attendance": attendance
     }
 
-def crawl_single_match_basic(season, match_id):
-    with open(f"match_links_{season}.json", "r", encoding="utf-8") as f:
-        match_data = json.load(f)
-    match_info = next((m for m in match_data if m["match_id"] == match_id), None)
-    if not match_info:
-        print(f"[ERROR] match_id {match_id} not found in match_links_{season}.json")
-        return None
-
+def crawl_single_match_basic(season, match_info):
     url = build_match_url(
         season,
-        match_id,
+        match_info["match_id"],
         team_slug=match_info.get("team_slug"),
         internal_id=match_info.get("internal_id")
     )
-    return fetch_match_data(url, match_id, match_info.get("internal_id"))
+    return fetch_match_data(url, match_info["match_id"], match_info.get("internal_id"))
+
 
 
 

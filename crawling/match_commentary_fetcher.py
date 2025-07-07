@@ -1,4 +1,3 @@
-import json
 import chromedriver_autoinstaller
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -86,13 +85,7 @@ def get_commentary(driver, match_url):
         print(f"[ERROR] Failed to get commentary from {match_url}: {e}")
     return commentary_data
 
-def crawl_single_match_commentary(season, match_id):
-    with open(f"match_links_{season}.json", "r", encoding="utf-8") as f:
-        match_data = json.load(f)
-    match = next((m for m in match_data if m["match_id"] == match_id), None)
-    if not match:
-        print(f"[ERROR] Match {match_id} not found in match_links_{season}.json")
-        return None
+def crawl_single_match_commentary(season, match_info):
     chromedriver_autoinstaller.install()
     options = Options()
     options.add_argument("--no-sandbox")
@@ -102,15 +95,14 @@ def crawl_single_match_commentary(season, match_id):
     options.add_argument("--headless")
     driver = webdriver.Chrome(options=options)
     try:
-        commentary = get_commentary(driver, build_commentary_url(match))
-        # _id를 match_id와 internal_id 조합으로 생성
-        commentary["_id"] = f"{match['match_id']}_{match.get('internal_id')}"
-        commentary["match_id"] = match["match_id"]
-        commentary["internal_id"] = match.get("internal_id")
-        print(f"Commentary crawling completed: {match['match_id']}")
+        commentary = get_commentary(driver, build_commentary_url(match_info))
+        commentary["_id"] = f"{match_info['match_id']}_{match_info.get('internal_id')}"
+        commentary["match_id"] = match_info["match_id"]
+        commentary["internal_id"] = match_info.get("internal_id")
+        print(f"Commentary crawling completed: {match_info['match_id']} ({match_info.get('internal_id')})")
         return commentary
     except Exception as e:
-        print(f"[ERROR] Failed to crawl commentary for {match_id}: {e}")
+        print(f"[ERROR] Failed to crawl commentary for {match_info['match_id']} ({match_info.get('internal_id')}): {e}")
         return None
     finally:
         driver.quit()

@@ -1,4 +1,3 @@
-import json
 import time
 import chromedriver_autoinstaller
 from selenium import webdriver
@@ -54,14 +53,7 @@ def get_review_info(driver, match_url):
 
     return review_info
 
-def crawl_single_match_review(season, match_id):
-    with open(f"match_links_{season}.json", "r", encoding="utf-8") as f:
-        match_data = json.load(f)
-    match = next((m for m in match_data if m["match_id"] == match_id), None)
-    if not match:
-        print(f"[ERROR] Match {match_id} not found in match_links_{season}.json")
-        return None
-
+def crawl_single_match_review(season, match_info):
     chromedriver_autoinstaller.install()
     options = Options()
     options.add_argument("--no-sandbox")
@@ -72,16 +64,15 @@ def crawl_single_match_review(season, match_id):
 
     driver = webdriver.Chrome(options=options)
     try:
-        match_url = build_match_url(match)
+        match_url = build_match_url(match_info)
         review_info = get_review_info(driver, match_url)
-        # _id를 match_id와 internal_id 조합으로 생성
-        review_info["_id"] = f"{match['match_id']}_{match.get('internal_id')}"
-        review_info["match_id"] = match["match_id"]
-        review_info["internal_id"] = match.get("internal_id")
-        print(f"Review crawling completed: {match['match_id']}")
+        review_info["_id"] = f"{match_info['match_id']}_{match_info.get('internal_id')}"
+        review_info["match_id"] = match_info["match_id"]
+        review_info["internal_id"] = match_info.get("internal_id")
+        print(f"Review crawling completed: {match_info['match_id']} ({match_info.get('internal_id')})")
         return review_info
     except Exception as e:
-        print(f"[ERROR] Failed to crawl review from {match_id} – {e}")
+        print(f"[ERROR] Failed to crawl review from {match_info['match_id']} ({match_info.get('internal_id')}) – {e}")
         return None
     finally:
         driver.quit()

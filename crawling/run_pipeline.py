@@ -32,34 +32,36 @@ def process_season(season):
     all_basic_data = []
     for idx, match in enumerate(match_data, start=1):
         print(f"[{idx}/{len(match_data)}] Basic crawling: {match['match_id']} ({match.get('internal_id')})")
-        basic = crawl_single_match_basic(season, match['match_id'])
+        basic = crawl_single_match_basic(season, match)
         if basic:
             all_basic_data.append(basic)
-    save_to_mongo(season, all_basic_data, "match_basic")
+    save_to_mongo(season, all_basic_data, "basic")
 
     # 2. Commentary 크롤링 및 저장
     all_commentary_data = []
     for idx, match in enumerate(match_data, start=1):
         print(f"[{idx}/{len(match_data)}] Commentary crawling: {match['match_id']} ({match.get('internal_id')})")
-        commentary = crawl_single_match_commentary(season, match['match_id'])
+        commentary = crawl_single_match_commentary(season, match)
         if commentary:
             all_commentary_data.append(commentary)
-    save_to_mongo(season, all_commentary_data, "match_commentary")
+    save_to_mongo(season, all_commentary_data, "commentary")
 
     # 3. Review 크롤링 및 저장 (리뷰 시즌만)
     if season in SEASONS_WITH_REVIEW:
         all_review_data = []
         for idx, match in enumerate(match_data, start=1):
             print(f"[{idx}/{len(match_data)}] Review crawling: {match['match_id']} ({match.get('internal_id')})")
-            review = crawl_single_match_review(season, match['match_id'])
+            review = crawl_single_match_review(season, match)
             if review:
                 all_review_data.append(review)
-        save_to_mongo(season, all_review_data, "match_review")
+        save_to_mongo(season, all_review_data, "review")
 
 if __name__ == "__main__":
     for season in SEASON_LIST:
         generate_match_links(season)
         process_season(season)
+
+
 
 
 
