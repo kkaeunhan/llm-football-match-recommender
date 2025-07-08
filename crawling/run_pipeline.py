@@ -9,8 +9,8 @@ from get_match_links import get_all_match_metadata
 # 환경변수 로드
 load_dotenv(dotenv_path="./env/.env")
 
-SEASON_LIST = ["2024-2025"]
-SEASONS_WITH_REVIEW = ["2024-2025", "2022-2023"]
+SEASON_LIST = ["2023-2024", "2022-2023", "2021-2022"]
+SEASONS_WITH_REVIEW = ["2024-2025", "2023-2024"]
 
 def generate_match_links(season):
     print(f"=== Generating match_links for season: {season} ===")
