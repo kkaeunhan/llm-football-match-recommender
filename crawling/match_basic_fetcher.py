@@ -16,7 +16,8 @@ def fetch_match_data(url, match_id, internal_id):
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--lang=en-GB")
-    options.add_argument("--headless")
+    options.add_argument("--window-size=375,812")
+    # options.add_argument("--headless")
 
     driver = webdriver.Chrome(options=options)
     driver.get(url)
@@ -113,6 +114,8 @@ def crawl_single_match_basic(season, match_info):
         internal_id=match_info.get("internal_id")
     )
     return fetch_match_data(url, match_info["match_id"], match_info.get("internal_id"))
+
+
 
 
 
