@@ -24,6 +24,9 @@ def split_event(event_text):
     return time_str, event_name
 
 def enable_key_events_only(driver):
+    """
+    Toggle 'Key Events' if possible. Return True if toggled, False if not available.
+    """
     try:
         toggle_button = WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "button[class*='Toggle']"))
@@ -32,8 +35,10 @@ def enable_key_events_only(driver):
         if aria_checked == "false":
             toggle_button.click()
             time.sleep(1)
-    except Exception as e:
-        print(f"[WARN] Could not toggle Key Events: {e}")
+        return True
+    except Exception:
+        # Toggle button not found
+        return False
 
 def get_commentary(driver, match_url):
     commentary_data = {
@@ -43,7 +48,10 @@ def get_commentary(driver, match_url):
     try:
         driver.get(match_url)
         time.sleep(3)
-        enable_key_events_only(driver)
+
+        toggled = enable_key_events_only(driver)
+
+        # Wait for ticker content regardless of toggle
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "div[class*='LiveTickerContent']"))
         )
@@ -67,8 +75,7 @@ def get_commentary(driver, match_url):
                         "event": event_name,
                         "content": content_text
                     })
-            except Exception as e:
-                print(f"[WARN] Failed to parse event: {e}")
+            except Exception:
                 continue
         try:
             summary_elem = driver.find_element(By.CSS_SELECTOR, "div[class*='LiveTickerTextEventContent']")
